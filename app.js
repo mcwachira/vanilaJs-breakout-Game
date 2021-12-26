@@ -1,8 +1,7 @@
 
-
 let ctx = document.getElementById("ctx").getContext('2d');
 ctx.font = '20px  calibri'
-ctx.fillText('PRESS SPACE BAR TO START GAME', 150, 250)
+ctx.fillText('CLICK ON THE CANVAS  TO START  THE  GAME', 70, 250)
 // ctx.fillText('this not working ', 100, 100);
 
 const height = 500;
@@ -52,12 +51,12 @@ document.getElementById('ctx').onmousedown = function () {
 
 
 document.onkeydown = function (event) {
-    if (event.key == 37) {
+    if (event.keyCode == 37) {
         base.pressingLeft = true;
         base.pressingRight = false;
 
     }
-    else if (event.key == 39) {
+    else if (event.keyCode == 39) {
         base.pressingLeft = false;
         base.pressingRight = true;
     }
@@ -65,12 +64,12 @@ document.onkeydown = function (event) {
 }
 
 document.onkeyup = function (event) {
-    if (event.key == 37) {
+    if (event.keyCode == 37) {
         base.pressingLeft = false;
 
 
     }
-    else if (event.key == 39) {
+    else if (event.keyCode == 39) {
         base.pressingRight = false;
     }
 
@@ -78,17 +77,17 @@ document.onkeyup = function (event) {
 
 const testCollision = (base, ball) => {
     return ((base.x < ball.x + 2 * ball.radius) &&
-        (ball.x > base.x + base.width) &&
-        (base.y > ball.y + 2 * ball.radius) &&
-        (ball.y > base.y + base.height))
+        (ball.x < base.x + base.width) &&
+        (base.y < ball.y + 2 * ball.radius) &&
+        (ball.y < base.y + base.height))
 }
 
 
 const tileCollision = (t, ball) => {
     return ((t.x < ball.x + 2 * ball.radius) &&
-        (ball.x > t.x + tile.width) &&
-        (t.y > ball.y + 2 * ball.radius) &&
-        (ball.y > t.y + tile.height))
+        (ball.x < t.x + tile.width) &&
+        (t.y < ball.y + 2 * ball.radius) &&
+        (ball.y < t.y + tile.height))
 }
 const drawBall = () => {
     ctx.save();
@@ -144,38 +143,52 @@ const updateBallPosition = () => {
     if (ball.x > width || ball.x < 0) {
         hitCount++
         if (hitCount % 10 === 0) {
-            ball.x = (Math.abs(ball.speedX) + 1)
-        } else {
-            ball.speedX += 1;
+
+            if (ball.speedX < 0) {
+                ball.speedX = -(Math.abs(ball.speedX) + 1)
+            }
+
+            else {
+                ball.speedX += 1;
+            }
         }
-        ball.x = -ball.speedX;
+        ball.speedX = -ball.speedX;
     }
 
     if (ball.y < 0) {
         hitCount++
         if (hitCount % 10 === 0) {
-            ball.y = (Math.abs(ball.speedY) + 1)
-        } else {
-            ball.speedy += 1;
+            if (ball.speedY < 0) {
+                ball.speedY = -(Math.abs(ball.speedY) + 1)
+            }
+            else {
+                ball.speedY += 1;
+            }
         }
-        ball.y = -ball.speedY;
+        ball.speedY = -ball.speedY;
     }
+
+
     if (ball.y > height) {
         hitCount++
         if (hitCount % 10 === 0) {
-            ball.y = (Math.abs(ball.speedY) + 1)
-        } else {
-            ball.speedY += 1;
+            if (ball.speedY < 0) {
+                ball.speedY = -(Math.abs(ball.speedY) + 1)
+
+            } else {
+                ball.speedY += 1;
+            }
         }
-        ball.y = -ball.speedY;
+        ball.speedY = -ball.speedY;
         base.lives--;
     }
 
 }
 
 const isGameOver = () => {
-    if (base.lives === 0 || score == 330) {
+    if (base.lives <= 0 || score == 420) {
         clearInterval(intervalValue);
+        base.lives = 0
         ctx.fiLlText('GAME OVER !  CLICK TO START GAME AGAIN', 150, 250)
     }
 }
@@ -193,10 +206,10 @@ const updateGame = () => {
         if (tileCollision(tileList[key], ball)) {
             delete tileList[key];
             ball.speedY = -ball.speedY;
-            score += 10;
+            score += 5;
         }
 
-  
+
     }
     ctx.fillText('Score: ' + score, 5, 490);
     ctx.fillText('Lives: ' + base.lives, 430, 490);
@@ -206,11 +219,12 @@ const updateGame = () => {
     updateBallPosition();
     drawBall();
     drawBase();
+    isGameOver()
 }
 
 
 const startGame = () => {
-    base.x = Math.floor(Math.random() * 100) + 1;
+    base.x = 150; //Math.floor(Math.random() * 100) + 1;
     ball.x = base.x + 100;
     ball.y = base.y - 100;
     let tileX = 5;
